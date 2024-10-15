@@ -19,11 +19,13 @@ jobs:
         node-version: '16'
 
     - name: Install marked.js
-      run: npm install -g marked
+      run: npm install marked
+
+    - name: Verify marked installation
+      run: npm list marked
     
     - name: Generate HTML from Markdown
-      run: |
-        node generateIndex.js
+      run: node generateIndex.js
     
     - name: Copy generated index.html to posts folder
       run: cp index.html posts/
