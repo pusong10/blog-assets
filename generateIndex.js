@@ -104,7 +104,7 @@ class BlogPostProcessor {
       const postContent = this._readFile(postPath);
       const { title, summary, htmlContent } = this._convertMarkdownToHTML(postContent);
 
-      postsHTML += htmlTemplate(title, summary, htmlContent);
+      postsHTML += htmlTemplate(title, summary, postFile);
       
       // Write HTML for individual post to the output directory
       const outputFilePath = path.join(this.outputDir, `${path.basename(postFile, '.md')}.html`);
