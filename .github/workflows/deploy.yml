@@ -20,6 +20,13 @@ jobs:
 
     - name: Install marked.js
       run: npm install -g marked
+    
+    - name: Generate HTML from Markdown
+      run: |
+        node generateIndex.js
+    
+    - name: Copy generated index.html to posts folder
+      run: cp index.html posts/
 
     - name: Convert Markdown to HTML
       run: |
