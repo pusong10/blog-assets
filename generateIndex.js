@@ -2,7 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const { marked } = require('marked');
 
-// Define paths
+// Configure marked to support tables
+marked.setOptions({
+    gfm: true, // Enable GitHub Flavored Markdown (GFM) to support tables, strikethrough, etc.
+    breaks: true, // Enable line breaks
+    headerIds: false, // Disable automatic IDs in headers
+  });
+
+  // Define paths
 const inputDir = path.join(__dirname, 'posts');
 const outputDir = path.join(__dirname, 'output');
 
@@ -19,12 +26,23 @@ body, html {
   font-family: Arial, sans-serif;
 }
 
+header {
+  background-color: #f1f1f1;
+  padding: 10px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
 .content-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 80vh;
   text-align: center;
 }
 
@@ -44,18 +62,70 @@ body, html {
   padding: 10px 0;
 }
 
-h1 {
-  margin-bottom: 20px;
+button {
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  text-decoration: none;
 }
 
-.post {
-  margin-bottom: 40px;
+button:hover {
+  background-color: #0056b3;
+}
+
+footer {
+  margin-top: 20px;
+  text-align: center;
+  padding: 10px;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  background-color: #f1f1f1;
+}
+
+footer p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
 }
 `;
 
-const htmlTemplate = (title, summary, postFile) => `
+const postHTMLTemplate = (title, summary, content) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Blog</h1>
+  </header>
+  <div class="content-wrapper">
+    <h2 class="post-title">${title}</h2>
+    <p class="post-summary">${summary}</p>
+    <div class="post-content">${content}</div>
+    <button onclick="window.location.href='index.html'">Back to Home</button>
+  </div>
+  <footer>
+    <p>&copy; 2024 Your Blog Name. All rights reserved.</p>
+  </footer>
+</body>
+</html>
+`;
+
+const postListItemHTMLTemplate = (title, summary, postFile) => `
   <div class="post">
-    <h2 class="post-title" onclick="goToPost('${postFile}')">${title}</h2>
+    <h2 class="post-title">
+      <a href="${postFile}">${title}</a>
+    </h2>
     <p class="post-summary">${summary}</p>
   </div>
 `;
@@ -70,18 +140,21 @@ const indexHTMLTemplate = (postsHTML) => `
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="content-wrapper">
+  <header>
     <h1>Blog Index</h1>
-    <div id="posts-list">${postsHTML}</div>
+  </header>
+  <div class="content-wrapper">
+    <div id="posts-list">
+      ${postsHTML}
+    </div>
   </div>
-  <script>
-    function goToPost(postFile) {
-      window.location.href = postFile;
-    }
-  </script>
+  <footer>
+    <p>&copy; 2024 Your Blog Name. All rights reserved.</p>
+  </footer>
 </body>
 </html>
 `;
+
 
 class BlogPostProcessor {
   constructor(inputDir, outputDir) {
@@ -96,22 +169,23 @@ class BlogPostProcessor {
 
   // Method to process all Markdown files
   processPosts() {
-    const posts = this._getMarkdownFiles();
-    let postsHTML = '';
+    const markdownFiles = this._getMarkdownFiles();
+    let indexPostsHTML = ''; // This will hold the list of post titles and summaries for the index page
 
-    posts.forEach(postFile => {
-      const postPath = path.join(this.inputDir, postFile);
+    markdownFiles.forEach(file => {
+      const postPath = path.join(this.inputDir, file);
       const postContent = this._readFile(postPath);
       const { title, summary, htmlContent } = this._convertMarkdownToHTML(postContent);
 
-      postsHTML += htmlTemplate(title, summary, `${path.basename(postFile, '.md')}.html`);
-      
-      // Write HTML for individual post to the output directory
-      const outputFilePath = path.join(this.outputDir, `${path.basename(postFile, '.md')}.html`);
-      this._writeToFile(outputFilePath, htmlContent);
+      // Generate individual post HTML
+      const postFilePath = path.join(this.outputDir, `${path.basename(file, '.md')}.html`);
+      this._writeToFile(postFilePath, postHTMLTemplate(title, summary, htmlContent));
+
+      // Add link to this post on the index page
+      indexPostsHTML += postListItemHTMLTemplate(title, summary, postFilePath);
     });
 
-    return postsHTML;
+    return indexPostsHTML; // Return the HTML for all posts that will be included in the index page
   }
 
   // Method to write to a file
