@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const marked = require('marked');
+const { marked } = require('marked');
 
 // 读取posts目录
 const postsDir = path.join(__dirname, 'posts');
