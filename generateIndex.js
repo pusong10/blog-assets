@@ -182,7 +182,7 @@ class BlogPostProcessor {
       this._writeToFile(postFilePath, postHTMLTemplate(title, summary, htmlContent));
 
       // Add link to this post on the index page
-      indexPostsHTML += postListItemHTMLTemplate(title, summary, postFilePath);
+      indexPostsHTML += postListItemHTMLTemplate(title, summary, path.basename(postFilePath));
     });
 
     return indexPostsHTML; // Return the HTML for all posts that will be included in the index page
