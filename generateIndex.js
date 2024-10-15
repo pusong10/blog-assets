@@ -8,40 +8,58 @@ const outputDir = path.join(__dirname, 'output');
 
 // CSS Template
 const stylesCSS = `
-body {
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
   font-family: Arial, sans-serif;
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
 }
 
 .post-title {
   cursor: pointer;
   color: blue;
   text-decoration: underline;
+  margin-bottom: 10px;
 }
 
 .post-summary {
   font-style: italic;
+  margin-bottom: 20px;
 }
 
 .post-content {
-  display: none;
   padding: 10px 0;
 }
 
-.post-content.visible {
-  display: block;
+h1 {
+  margin-bottom: 20px;
+}
+
+.post {
+  margin-bottom: 40px;
 }
 `;
 
-// HTML Template for individual posts
-const htmlTemplate = (title, summary, content) => `
+const htmlTemplate = (title, summary, postFile) => `
   <div class="post">
-    <h2 class="post-title" onclick="toggleContent(this)">${title}</h2>
+    <h2 class="post-title" onclick="goToPost('${postFile}')">${title}</h2>
     <p class="post-summary">${summary}</p>
-    <div class="post-content">${content}</div>
   </div>
 `;
 
-// HTML Template for the index page
 const indexHTMLTemplate = (postsHTML) => `
 <!DOCTYPE html>
 <html lang="en">
@@ -52,13 +70,13 @@ const indexHTMLTemplate = (postsHTML) => `
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Blog Index</h1>
-  <div id="posts-list">${postsHTML}</div>
+  <div class="content-wrapper">
+    <h1>Blog Index</h1>
+    <div id="posts-list">${postsHTML}</div>
+  </div>
   <script>
-    function toggleContent(element) {
-      const contentDiv = element.nextElementSibling.nextElementSibling;
-
-      contentDiv.classList.toggle('visible');
+    function goToPost(postFile) {
+      window.location.href = postFile;
     }
   </script>
 </body>
