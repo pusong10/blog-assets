@@ -26,6 +26,10 @@ body {
   display: none;
   padding: 10px 0;
 }
+
+.post-content.visible {
+  display: block;
+}
 `;
 
 // HTML Template for individual posts
@@ -53,11 +57,8 @@ const indexHTMLTemplate = (postsHTML) => `
   <script>
     function toggleContent(element) {
       const contentDiv = element.nextElementSibling.nextElementSibling;
-      if (contentDiv.style.display === 'none') {
-        contentDiv.style.display = 'block';
-      } else {
-        contentDiv.style.display = 'none';
-      }
+
+      contentDiv.classList.toggle('visible');
     }
   </script>
 </body>
